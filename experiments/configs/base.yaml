@@ -1,0 +1,22 @@
+data:
+  countries: [IND, USA, GBR, DEU, BRA, ZAF, JPN, FRA, ITA, KOR]
+  train_end: "2022-01-01"
+  val_weeks: 8
+
+model:
+  latent_dim: 32
+  hidden_dim: 64
+  dropout: 0.1
+
+training:
+  lr: 1e-3
+  weight_decay: 1e-4
+  epochs: 1000
+  beta_anneal_epochs: 50
+  grad_clip: 1.0
+  solver: dopri5
+  rtol: 1e-4
+  atol: 1e-5
+
+uncertainty:
+  n_samples: 100
