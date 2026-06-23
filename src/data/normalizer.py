@@ -1,10 +1,3 @@
-"""
-src/data/normalizer.py
-
-Per-country z-score normalization.
-Critical: normalize per country, not globally.
-India's case counts and Germany's are incomparable raw.
-"""
 
 import numpy as np
 import pandas as pd
