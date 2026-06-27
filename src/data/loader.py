@@ -10,7 +10,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 RAW_DIR  = ROOT_DIR / "data" / "raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
-OWID_URL  = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
+OWID_URL  = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv"
 OWID_PATH = RAW_DIR / "owid_covid_raw.csv"
 
 TARGET_COUNTRIES = [
