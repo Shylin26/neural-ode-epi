@@ -60,7 +60,7 @@ def clean_owid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         
         group[target] = (
             group[target]
-            .fillna(method="ffill", limit=3)  
+            .ffill(limit=3) 
             .rolling(3, center=True, min_periods=1)
             .median()
         )
