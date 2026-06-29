@@ -40,6 +40,7 @@ model = LatentODE(
     atol        = 1e-4,
 )
 
+
 total_params = sum(p.numel() for p in model.parameters())
 log.info(f"Model parameters: {total_params:,}")
 trainer = Trainer(
