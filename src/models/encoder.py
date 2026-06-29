@@ -63,6 +63,7 @@ class ODERNNEncoder(nn.Module):
             x_i=values[:,i,:]
             h_updated=self.gru_cell(x_i,h)
             h=obs_mask*h_updated+(1-obs_mask)*h
+            h = torch.nan_to_num(h, nan=0.0)
         
         mu =self.to_mu(h)
         logsigma=self.to_logsigma(h)
