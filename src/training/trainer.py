@@ -66,14 +66,15 @@ class Trainer:
 
     def train_epoch(self, epoch: int) -> dict:
         self.model.train()
-        beta         = kl_weight(epoch, self.warmup_epochs)
-        rtol, atol   = solver_tolerance(epoch, self.warmup_epochs)
+        beta       = kl_weight(epoch, self.warmup_epochs)
+        rtol, atol = solver_tolerance(epoch, self.warmup_epochs)
 
         self.model.rtol = rtol
         self.model.atol = atol
 
         total_loss = recon_loss = kl_loss = nfe_sum = 0.0
         n_batches  = 0
+        grad_norm  = torch.tensor(0.0)
 
         for batch in self.train_dl:
             batch = self._batch_to_device(batch)
@@ -82,7 +83,7 @@ class Trainer:
             self.model.odefunc.nfe = 0
 
             x_hat, mu, logsigma = self.model(
-                batch["times"][0],      # times same for all in batch → take first
+                batch["times"][0],
                 batch["values"],
                 batch["mask"],
                 batch["country_id"],
@@ -93,13 +94,15 @@ class Trainer:
                 mu, logsigma, beta=beta,
             )
 
-            loss.backward()
+            if torch.isnan(loss):
+                print(f"NaN — mu:[{mu.min():.2f},{mu.max():.2f}] "
+                      f"ls:[{logsigma.min():.2f},{logsigma.max():.2f}]")
+                continue
 
-            # Gradient clipping — critical for adjoint stability
+            loss.backward()
             grad_norm = torch.nn.utils.clip_grad_norm_(
                 self.model.parameters(), self.grad_clip
             )
-
             self.optimizer.step()
 
             total_loss += loss.item()
@@ -109,6 +112,12 @@ class Trainer:
             n_batches  += 1
 
         self.scheduler.step()
+
+        if n_batches == 0:
+            return {"loss": float("nan"), "recon": float("nan"),
+                    "kl": float("nan"), "nfe": 0, "beta": beta,
+                    "rtol": rtol, "lr": self.scheduler.get_last_lr()[0],
+                    "grad_norm": 0.0}
 
         return {
             "loss":      total_loss / n_batches,
