@@ -80,9 +80,10 @@ class LatentODE(nn.Module):
         upper=preds.quantile(0.95,dim=0)
         return mean,lower,upper
 
-def kl_divergence(mu:torch.Tensor,logsigma:torch.Tensor)->torch.Tensor:
+def kl_divergence(mu: torch.Tensor, logsigma: torch.Tensor) -> torch.Tensor:
+    mu       = torch.clamp(mu,       min=-10, max=10)
+    logsigma = torch.clamp(logsigma, min=-4,  max=2)
     return -0.5 * (1 + 2*logsigma - mu**2 - torch.exp(2*logsigma)).sum(dim=-1).mean()
-
 def elbo_loss(
         x: torch.Tensor,
         x_hat: torch.Tensor,
