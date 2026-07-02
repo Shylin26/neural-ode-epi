@@ -74,6 +74,7 @@ class Trainer:
 
         total_loss = recon_loss = kl_loss = nfe_sum = 0.0
         n_batches  = 0
+        nan_count=0
         grad_norm  = torch.tensor(0.0)
 
         for batch in self.train_dl:
@@ -95,8 +96,7 @@ class Trainer:
             )
 
             if torch.isnan(loss):
-                print(f"NaN — mu:[{mu.min():.2f},{mu.max():.2f}] "
-                      f"ls:[{logsigma.min():.2f},{logsigma.max():.2f}]")
+                nan_count += 1
                 continue
 
             loss.backward()
